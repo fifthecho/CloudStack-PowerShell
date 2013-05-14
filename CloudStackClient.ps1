@@ -8,8 +8,12 @@
 .PARAMETER options
    Optional command options that can be passed in to commands.
 .EXAMPLE
-   <An example of using the script>
+   CloudStackClient.ps1 -command listVirtualMachines -options zoneid=c3132929-9e55-443c-bce1-33b73faef801
 #>
+# Writen by Takashi Kanai (anikundesu@gmail.com), Jeff Moody (fifthecho@gmail.com)
+#
+# 2011/9/16  v1.0 created
+# 2013/5/13  v1.1 created to work with CloudPlatform 3.0.6 and migrated to entirely new codebase for maintainability and readability.
 
 Param(
 	[Parameter(Mandatory=$true)]
