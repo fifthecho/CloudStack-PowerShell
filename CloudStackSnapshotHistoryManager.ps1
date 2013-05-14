@@ -1,22 +1,28 @@
 ﻿<#
 .SYNOPSIS
-   A CloudStack/CloudPlatform Volume Snapshot Agent.
+   A CloudStack/CloudPlatform Volume Snapshot History Manager.
 .DESCRIPTION
    A feature-rich Apache CloudStack/Citrix CloudPlatform API client for issuing commands to the Cloud Management system.
 .PARAMETER volume
-   The volume parameter is MANDATORY and specifies which volume you are wanting to take a snapshot of.
+   The volume parameter is MANDATORY and specifies which volume you are wanting to manage the snapshots of.
+.PARAMETER days
+   The number of days prior to today that you want to keep snapshots for.
 .EXAMPLE
-   CloudStackSnapshot.ps1 -volume da0018ed-ce52-4d37-a5fb-6f121eb503c3
+   CloudStackSnapshotHistoryManager.ps1 -volume da0018ed-ce52-4d37-a5fb-6f121eb503c3 -days 7
 #>
 # Writen by Jeff Moody (fifthecho@gmail.com)
 #
-# 2011/9/16  v1.0 created
-# 2013/5/13  v1.1 created to work with CloudPlatform 3.0.6 and migrated to entirely new codebase for maintainability and readability.
+# 2011/5/15  v1.0 created
+
 
 Param(
 	[Parameter(Mandatory=$true)]
 	[String]
     $volume
+,
+    [Parameter(Mandatory=$true)]
+    [Int]
+    $days
 )
 
 function CloudStackClient
@@ -116,18 +122,23 @@ function CloudStackClient
         return
 }
 
-$job = CloudStackClient -command createSnapshot -options volumeid=$volume
-Write-Debug "Job: $job"
-$jobid = $job.createsnapshotresponse.jobid
-Write-Host "Started snapshot job $jobid"
-do {
-    Write-Host -NoNewline "."
-    $jobStatus = CloudStackClient -command queryAsyncJobResult -options jobid=$jobid
-    Start-Sleep -Seconds 5
-    }
-while ($jobStatus.queryasyncjobresultresponse.jobstatus -eq 0)
-$statusCode = $jobStatus.queryasyncjobresultresponse.jobresultcode
-if ($statusCode -ne 0) {
-    Write-Error $jobStatus.queryasyncjobresultresponse.jobresult
+$job = CloudStackClient -command listSnapshots -options volumeid=$volume
+
+$snapshots = $job.listsnapshotsresponse.snapshot
+$days = 0 - $days
+
+$purgeDate = [DateTime]::Today.AddDays($days).DayOfYear
+
+foreach($snap in $snapshots){
+    Write-Debug $snap
+    if ([DateTime]::Parse($snap.created).DayOfYear -lt $purgeDate){
+        $snapDate = [DateTime]::Parse($snap.created).ToShortDateString()
+        $snapID = $snap.id
+        Write-Host "Deleting Snapshot $snapID from $snapDate."
+        $deleteJob = CloudStackClient -command deleteSnapshot -options id=$snapID
+        Write-Debug "Delete job: $deleteJob"
+        }
+    
 }
-return $statusCode
+
+Write-Host

@@ -35,11 +35,11 @@ $FileExists = (Test-Path $ChkFile -PathType Leaf)
 If (!($FileExists)) 
 {
 	Write-Host "Config file does not exist. Writing a basic config that you now need to customize."
-	echo "[general]" >> "$env:userprofile\cloud-settings.txt"
-	echo "Address=http://(your URL):8080/client/api?" >> "$env:userprofile\cloud-settings.txt"
-	echo "ApiKey=(Your API Key)" >> "$env:userprofile\cloud-settings.txt"
-	echo "SecretKey=(Your Secret Key)" >> "$env:userprofile\cloud-settings.txt"
-	echo "Format=(JSON/XML)" >> "$env:userprofile\cloud-settings.txt"
+	Write-Output "[general]" | Out-File "$env:userprofile\cloud-settings.txt"
+	Write-Output "Address=http://(your URL):8080/client/api?" | Out-File "$env:userprofile\cloud-settings.txt"
+	Write-Output "ApiKey=(Your API Key)" | Out-File "$env:userprofile\cloud-settings.txt"
+	Write-Output "SecretKey=(Your Secret Key)" | Out-File "$env:userprofile\cloud-settings.txt"
+	Write-Output "Format=(XML/JSON)" >> "$env:userprofile\cloud-settings.txt"
 	Return 1
 }
 ElseIf ($FileExists)
@@ -52,16 +52,16 @@ ElseIf ($FileExists)
 	$FORMAT=$h.Get_Item("Format")
     $formatString = "response=" + $FORMAT.ToLower()
     $options += $formatString
-#	echo "Address: "$ADDRESS
-#	echo "API Key: "$API_KEY
-#	echo "Secret Key: "$SECRET_KEY
-#	echo "Format: "$FORMAT
-#   echo "Command: "$command
-#   echo "Options: "$options
+	Write-Debug "Address: $ADDRESS"
+	Write-Debug "API Key: $API_KEY"
+	Write-Debug "Secret Key: $SECRET_KEY"
+	Write-Debug "Format: $FORMAT"
+    Write-Debug "Command: $command"
+    Write-Debug "Options: $options"
 }
 ### URL Encoding $COMMAND variable
 $URL=$ADDRESS+"?apikey="+($API_KEY)+"&"+"command="+$command
-# echo "URL: "$URL
+Write-Debug "URL: $URL"
 $optionString=""
 foreach($o in $options){
     $o = $o -replace " ", "%20"
@@ -78,7 +78,7 @@ foreach($h in $hashOptions) {
 
 $hashString = $hashString.ToLower()
 
-# echo "String to calculate hash off of is: "$hashString
+Write-Debug "String to calculate hash off of is: $hashString"
 
 
 ### Signing Encoded URL with $SECRET_KEY
@@ -89,12 +89,12 @@ $Base64Digest = [System.Convert]::ToBase64String($Digest)
 $signature = [System.Web.HttpUtility]::UrlEncode($Base64Digest)
 $URL += "&signature="+$signature
 
-# echo "Base64Digest: " $Base64Digest
-# echo "Signature: "$signature
-# echo "Final URL: "$URL
+Write-Debug "Base64Digest: $Base64Digest"
+Write-Debug "Signature: $signature"
+Write-Debug "Final URL: $URL"
 
 ### Execute API Access & get Response
 $Response = $WebClient.DownloadString($URL)
-$Response
+Write-Output $Response
 
 exit
