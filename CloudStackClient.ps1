@@ -45,14 +45,14 @@ ElseIf ($FileExists)
 	$API_KEY=$h.Get_Item("ApiKey")
 	$SECRET_KEY=$h.Get_Item("SecretKey")
 	$FORMAT=$h.Get_Item("Format")
-    #$formatString = "response=" + $FORMAT.ToLower()
-    #$options += $formatString
-	echo "Address: "$ADDRESS
-	echo "API Key: "$API_KEY
-	echo "Secret Key: "$SECRET_KEY
-	echo "Format: "$FORMAT
-    echo "Command: "$command
-    echo "Options: "$options
+    $formatString = "response=" + $FORMAT.ToLower()
+    $options += $formatString
+#	echo "Address: "$ADDRESS
+#	echo "API Key: "$API_KEY
+#	echo "Secret Key: "$SECRET_KEY
+#	echo "Format: "$FORMAT
+#   echo "Command: "$command
+#   echo "Options: "$options
 }
 ### URL Encoding $COMMAND variable
 $URL=$ADDRESS+"?apikey="+($API_KEY)+"&"+"command="+$command
@@ -70,17 +70,26 @@ foreach($h in $hashOptions) {
     $h = $h -replace " ", "%20"
     $hashString += "&" + $h.ToLower()
 }
-echo "String to calculate hash off of is: "$hashString
+
+$hashString = $hashString.ToLower()
+
+# echo "String to calculate hash off of is: "$hashString
+
 
 ### Signing Encoded URL with $SECRET_KEY
 $HMAC_SHA1 = New-Object System.Security.Cryptography.HMACSHA1
 $HMAC_SHA1.key = [Text.Encoding]::ASCII.GetBytes($SECRET_KEY)
-$encodedHashString = [System.Web.HttpUtility]::UrlEncode($hashString)
-$Digest = $HMAC_SHA1.ComputeHash([Text.Encoding]::ASCII.GetBytes($encodedHashString))
+$Digest = $HMAC_SHA1.ComputeHash([Text.Encoding]::ASCII.GetBytes($hashString))
 $Base64Digest = [System.Convert]::ToBase64String($Digest)  
 $signature = [System.Web.HttpUtility]::UrlEncode($Base64Digest)
 $URL += "&signature="+$signature
 
-echo "Base64Digest: " $Base64Digest
-echo "Signature: "$signature
-echo "Final URL: "$URL
+# echo "Base64Digest: " $Base64Digest
+# echo "Signature: "$signature
+# echo "Final URL: "$URL
+
+### Execute API Access & get Response
+$Response = $WebClient.DownloadString($URL)
+$Response
+
+exit
