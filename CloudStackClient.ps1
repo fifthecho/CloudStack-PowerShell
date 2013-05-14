@@ -10,7 +10,8 @@
 .EXAMPLE
    CloudStackClient.ps1 -command listVirtualMachines -options zoneid=c3132929-9e55-443c-bce1-33b73faef801
 #>
-# Writen by Takashi Kanai (anikundesu@gmail.com), Jeff Moody (fifthecho@gmail.com)
+# Writen by Jeff Moody (fifthecho@gmail.com)
+# Based off code written by Takashi Kanai (anikundesu@gmail.com)
 #
 # 2011/9/16  v1.0 created
 # 2013/5/13  v1.1 created to work with CloudPlatform 3.0.6 and migrated to entirely new codebase for maintainability and readability.
