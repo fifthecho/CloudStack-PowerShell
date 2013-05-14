@@ -95,6 +95,7 @@ Write-Debug "Final URL: $URL"
 
 ### Execute API Access & get Response
 $Response = $WebClient.DownloadString($URL)
+# $Response = Invoke-RestMethod -Uri $URL -Method Get
 Write-Output $Response
 
 exit

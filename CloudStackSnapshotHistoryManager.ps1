@@ -140,5 +140,3 @@ foreach($snap in $snapshots){
         }
     
 }
-
-Write-Host

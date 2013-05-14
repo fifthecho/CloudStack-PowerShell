@@ -112,8 +112,7 @@ function CloudStackClient
         ### Execute API Access & get Response
         # $Response = $WebClient.DownloadString($URL)
         $Response = Invoke-RestMethod -Uri $URL -Method Get
-        $Response
-        return
+        return $Response
 }
 
 $job = CloudStackClient -command createSnapshot -options volumeid=$volume
@@ -130,4 +129,6 @@ $statusCode = $jobStatus.queryasyncjobresultresponse.jobresultcode
 if ($statusCode -ne 0) {
     Write-Error $jobStatus.queryasyncjobresultresponse.jobresult
 }
-return $statusCode
+if ($statusCode -ne 0) {
+    return $statusCode
+}
