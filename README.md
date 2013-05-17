@@ -17,7 +17,7 @@ To install the module correctly, run the following in PowerShell:
 	Copy-Item .\CloudStackClient.psm1 $PSModulePath\CloudStackClient\CloudStackClient.psm1
 ```	
 
-Once the module is installed, it can be loaded via "Import-Module CloudStackClient"
+Once the module is installed, it can be loaded via ```Import-Module CloudStackClient```
 
 The CloudStackListVirtualMachines, CloudStackSnapshotVolume, and CloudStackSnapshotHistoryManager 
 scripts shoud give you an idea of how to interact with the Module.
