@@ -39,6 +39,9 @@
     <Content Include="CloudStackSnapshotVolume.ps1">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="LICENSE.txt">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="README.md">
       <SubType>Content</SubType>
     </Content>
