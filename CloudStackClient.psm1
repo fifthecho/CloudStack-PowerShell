@@ -16,6 +16,7 @@
 # 2011/9/16  v1.0 created
 # 2013/5/13  v1.1 created to work with CloudPlatform 3.0.6 and migrated to entirely new codebase for maintainability and readability.
 # 2013/5/17  v2.0 created to modularize everything.
+# 2013/6/20  v2.1 created to add Powershell 2 support
 
 [VOID][System.Reflection.Assembly]::Load("System.Web, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a");
 $WebClient = New-Object net.WebClient
@@ -128,10 +129,10 @@ function Import-CloudStackConfig{
 	If (!($FileExists)) 
 	{
 		Write-Error "Config file does not exist. Writing a basic config that you now need to customize."
-		Write-Output "[general]" | Out-File "$env:userprofile\cloud-settings.txt"
-		Write-Output "Address=http://(your URL):8080/client/api?" | Out-File "$env:userprofile\cloud-settings.txt"
-		Write-Output "ApiKey=(Your API Key)" | Out-File "$env:userprofile\cloud-settings.txt"
-		Write-Output "SecretKey=(Your Secret Key)" | Out-File "$env:userprofile\cloud-settings.txt"
+		Write-Output "[general]
+Address=http://(your URL):8080/client/api?
+ApiKey=(Your API Key)
+SecretKey=(Your Secret Key)" | Out-File "$env:userprofile\cloud-settings.txt"
 		Return 1
 	}
 	ElseIf ($FileExists)
