@@ -22,10 +22,10 @@ $WebClient = New-Object net.WebClient
 
 function New-CloudStack{
 	Param(
-			[Parameter (Mandatory = $true)]
+			[Parameter(Mandatory = $true)]
 	        [String] $apiEndpoint
 		,
-			[Parameter (Mandatory = $true)]
+			[Parameter(Mandatory = $true)]
 	        [String] $apiPublicKey
 		,
 	        [Parameter(Mandatory = $true)]
@@ -94,7 +94,26 @@ function Get-CloudStack{
 	$signature = calculateSignature -SECRET_KEY $SECRET_KEY -HASH_STRING $optionString.ToLower()
 	$URL += "&signature="+$signature
 	Write-Debug("URL: $URL")
-	$Response = Invoke-RestMethod -Uri $URL -Method Get
+    $Response = ""
+    if ($psversiontable.psversion.Major -ge 3) {
+	    $Response = Invoke-RestMethod -Uri $URL -Method Get
+    }
+    else {
+        $httpWebRequest = [System.Net.WebRequest]::Create($URL);
+        $httpWebRequest.Method = "GET";  
+        $httpWebRequest.Headers.Add("Accept-Language: en-US");
+
+        $httpWebResponse = $httpWebRequest.GetResponse();
+        $responseStream = $httpWebResponse.GetResponseStream();
+        $streamReader = New-Object System.IO.StreamReader($responseStream);
+        $temp = $streamReader.ReadToEnd();
+        $Response = [xml]$temp
+
+        $responseStream.Close();
+        $streamReader.Close();
+        $httpWebResponse.Close(); 
+    }
+
 	return $Response
 	
 }
