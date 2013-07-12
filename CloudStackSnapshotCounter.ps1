@@ -16,7 +16,7 @@ $parameters = Import-CloudStackConfig
 
 if ($parameters -ne 1) {
 	$cloud = New-CloudStack -apiEndpoint $parameters[0] -apiPublicKey $parameters[1] -apiSecretKey $parameters[2]
-    $volumeListJob = Get-CloudStack -cloudStack $cloud -command listVolumes
+    $volumeListJob = Get-CloudStack -cloudStack $cloud -command listVolumes -options type=ROOT
     $volumes = $volumeListJob.listvolumesresponse.volume 
     foreach($v in $volumes){
         $volumeID = $v.id
@@ -27,7 +27,20 @@ if ($parameters -ne 1) {
         if ($snapshotListJob.listsnapshotsresponse.count){
             $count = $snapshotListJob.listsnapshotsresponse.count
         }
-        Write-Host " Volume $volumeName has $count snapshots"
+        Write-Host "ROOT Volume $volumeName has $count snapshots"
+    }
+    $volumeListJob = Get-CloudStack -cloudStack $cloud -command listVolumes -options type=DATADISK
+    $volumes = $volumeListJob.listvolumesresponse.volume 
+    foreach($v in $volumes){
+        $volumeID = $v.id
+        $volumeName = $v.name
+        $snapshotListJob = Get-CloudStack -cloudStack $cloud -command listSnapshots -options volumeid=$volumeID
+        $snaps = $snapshotListJob.listsnapshotresponse
+        $count = 0
+        if ($snapshotListJob.listsnapshotsresponse.count){
+            $count = $snapshotListJob.listsnapshotsresponse.count
+        }
+        Write-Host "DATADISK Volume $volumeName has $count snapshots"
     }
 }
 else {
