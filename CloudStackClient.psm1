@@ -129,10 +129,11 @@ function Import-CloudStackConfig{
 	If (!($FileExists)) 
 	{
 		Write-Error "Config file does not exist. Writing a basic config that you now need to customize."
-		Write-Output "[general]
-Address=http://(your URL):8080/client/api?
-ApiKey=(Your API Key)
-SecretKey=(Your Secret Key)" | Out-File "$env:userprofile\cloud-settings.txt"
+        Write-Output "[general]" | Out-File $ChkFile
+        Add-Content $ChkFile "`nAddress=http://(your URL):8080/client/api"
+        Add-Content $ChkFile "`nApiKey=(Your API Key)"
+        Add-Content $ChkFile "`nSecretKey=(Your Secret Key)"
+        Add-Content $ChkFile "`nEMail=(E-Mail Recipients, comma seperated)"
 		Return 1
 	}
 	ElseIf ($FileExists)
