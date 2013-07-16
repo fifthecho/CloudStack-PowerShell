@@ -33,22 +33,26 @@ if ($parameters -ne 1) {
 	$cloud = New-CloudStack -apiEndpoint $parameters[0] -apiPublicKey $parameters[1] -apiSecretKey $parameters[2]
 	$job = Get-CloudStack -cloudStack $cloud -command listSnapshots -options volumeid=$volume
 
-	$snapshots = $job.listsnapshotsresponse.snapshot
-	$days = 0 - $days
+	if($snapshots = $job.listsnapshotsresponse.snapshot){
+    	$days = 0 - $days
 
-	$purgeDate = [DateTime]::Today.AddDays($days).DayOfYear
+    	$purgeDate = [DateTime]::Today.AddDays($days).DayOfYear
 
-	foreach($snap in $snapshots){
-	    Write-Debug $snap
-	    if ([DateTime]::Parse($snap.created).DayOfYear -lt $purgeDate){
-	        $snapDate = [DateTime]::Parse($snap.created).ToShortDateString()
-	        $snapID = $snap.id
-	        Write-Host "Deleting Snapshot $snapID from $snapDate."
-	        $deleteJob = Get-CloudStack -cloudStack $cloud -command deleteSnapshot -options id=$snapID
-	        Write-Debug "Delete job: $deleteJob"
-	        }
-	    
-	}
+    	foreach($snap in $snapshots){
+    	    Write-Debug $snap
+    	    if ([DateTime]::Parse($snap.created).DayOfYear -lt $purgeDate){
+    	        $snapDate = [DateTime]::Parse($snap.created).ToShortDateString()
+    	        $snapID = $snap.id
+    	        Write-Host "Deleting Snapshot $snapID from $snapDate."
+    	        $deleteJob = Get-CloudStack -cloudStack $cloud -command deleteSnapshot -options id=$snapID
+    	        Write-Debug "Delete job: $deleteJob"
+    	        }
+    	    
+    	}
+    }
+    else{
+        Write-Host "No snapshots for volume $volume to delete."
+    }
 }
 else {
 	Write-Error "Please configure the $env:userprofile\cloud-settings.txt file"
