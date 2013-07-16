@@ -133,7 +133,6 @@ function Import-CloudStackConfig{
         Add-Content $ChkFile "`nAddress=http://(your URL):8080/client/api"
         Add-Content $ChkFile "`nApiKey=(Your API Key)"
         Add-Content $ChkFile "`nSecretKey=(Your Secret Key)"
-        Add-Content $ChkFile "`nEMail=(E-Mail Recipients, comma seperated)"
 		Return 1
 	}
 	ElseIf ($FileExists)
