@@ -1,37 +1,85 @@
 <#
 .SYNOPSIS
-   A CloudStack/CloudPlatform Virtual Machine HA toggling Scriptlet.
+    A CloudStack/CloudPlatform Virtual Machine Desployment Scriptlet
 .DESCRIPTION
-   Alter a virtual machine running within a CloudStack Cloud to be HA Enabled or Disabled..
-.PARAMETER instanceid
-   The instance ID of the VM.
-.PARAMETER state
-   The state of HA, should be "true" or "false"
-.EXAMPLE
-   CloudStackHAToggle.ps1 -instanceid 2665390c-6ee0-4145-adaa-b9275d715295 -state false
+    Use this script to deploy a virtual machine in a CloudStack Cloud.
+.PARAMETER templateid
+    The template ID for the VM.
+.PARAMETER zoneid
+    The zone for the VM
+.PARAMETER serviceofferingid
+    The Service offering ID for the VM
+.PARAMETER securitygroupids
+    The Security Group IDs for the VM
+.PARAMETER networkids
+    The Security Group IDs for the VM
 #>
 # Writen by Jeff Moody (fifthecho@gmail.com)
 #
-# 2013/7/18  v1.0 created
+# 2013/7/19  v1.0 created
 
 Param(
 [Parameter(Mandatory=$true)]
   [String]
-  $instanceid
+  $templateid
 ,
 [Parameter(Mandatory=$true)]
   [String]
-  $state
+  $zoneid
+,
+[Parameter(Mandatory=$true)]
+  [String]
+  $serviceofferingid
+,
+[Parameter(Mandatory=$false)]
+  [Array]
+  $securitygroupids
+,
+[Parameter(Mandatory=$false)]
+  [Array]
+  $networkids
 )
 
 Import-Module CloudStackClient
 $parameters = Import-CloudStackConfig
 
 if ($parameters -ne 1) {
-	$cloud = New-CloudStack -apiEndpoint $parameters[0] -apiPublicKey $parameters[1] -apiSecretKey $parameters[2]
-	$job = Get-CloudStack -cloudStack $cloud -command updateVirtualMachine -options id=$instanceid,haenable=$state
-    $hastatus = $job.updatevirtualmachineresponse.virtualmachine.haenable
-    Write-Host "Instance $instanceid has changed its HA status to $hastatus"
+    $cloud = New-CloudStack -apiEndpoint $parameters[0] -apiPublicKey $parameters[1] -apiSecretKey $parameters[2]
+  if($securitygroupids) {
+    $sids = $securitygroupids | Sort-Object
+    $sids = $sids -join "%2c"
+	$job = Get-CloudStack -cloudStack $cloud -command deployVirtualMachine -options serviceofferingid=$serviceofferingid,zoneid=$zoneid,securitygroupids=$sids,templateid=$templateid
+  }
+  elseif($networkids) {
+    $nids = $networkids | Sort-Object
+    $nids = $nids -join "%2c"
+    $job = Get-CloudStack -cloudStack $cloud -command deployVirtualMachine -options serviceofferingid=$serviceofferingid,zoneid=$zoneid,networkids=$nids,templateid=$templateid
+  }
+  else {
+    Write-Error "No network or security groups specified."
+  }
+
+  if($job){
+    $jobid = $job.deployvirtualmachineresponse.jobid
+    do {
+      Write-Host -NoNewline "."
+      $jobStatus = Get-CloudStack -cloudStack $cloud -command queryAsyncJobResult -options jobid=$jobid
+      Start-Sleep -Seconds 5
+    }
+    while ($jobStatus.queryasyncjobresultresponse.jobstatus -eq 0)
+    $statusCode = $jobStatus.queryasyncjobresultresponse.jobresultcode
+    if ($statusCode -ne 0) {
+      Write-Error $jobStatus.queryasyncjobresultresponse.errortext
+    }
+    else {
+      $vm = $jobStatus.queryasyncjobresultresponse.jobresult.virtualmachine
+      $vmid = $vm.id
+      $ip = $vm.nic.ipaddress
+      $password = $vm.password
+      Write-Host "`nVM $vmid deployed. VM IP Address is $ip and Administrator password is $password."
+    }
+
+  }
 	
 }
 else {
@@ -40,8 +88,8 @@ else {
 # SIG # Begin signature block
 # MIIRpQYJKoZIhvcNAQcCoIIRljCCEZICAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUtSvQNpz94mX7TGI7Cwuwy/Ze
-# NA2ggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUARF6iKBbEtid2Xt6GlvC7QjJ
+# G5Oggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
 # EwJJTDEWMBQGA1UEChMNU3RhcnRDb20gTHRkLjErMCkGA1UECxMiU2VjdXJlIERp
 # Z2l0YWwgQ2VydGlmaWNhdGUgU2lnbmluZzEpMCcGA1UEAxMgU3RhcnRDb20gQ2Vy
 # dGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDcxMDI0MjIwMTQ2WhcNMTcxMDI0MjIw
@@ -120,17 +168,17 @@ else {
 # aW5nMTgwNgYDVQQDEy9TdGFydENvbSBDbGFzcyAyIFByaW1hcnkgSW50ZXJtZWRp
 # YXRlIE9iamVjdCBDQQICCnYwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwxCjAI
 # oAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIB
-# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFColbt632ntExTyu7T06
-# BWVA+R1BMA0GCSqGSIb3DQEBAQUABIICAIZiQ2/edvrZkzNhhV2Mqw09pqMJml2w
-# gbCD9UCA9Ic/Y6VFzBaxP5mocuDXpeqg11ImllH7BFDVtcxeY709C2glKRf0G13I
-# /WuXzXgQlokFaCTk6KK/QElVj4Sgz3aqAvpt//PKHzr9u1Mg8wN4o/qefB5YmFly
-# M1iZp7J/1ANSMgXwwQKq2/jsXtvw19ZuoiSf9aM4KOOUvIt1iwm/f7Odd+QZq+B1
-# WYlurYoKtEPejnkzjrgn645uOzGtUKDFhWwt0fv/AbELA4cackghJbt9AFCgxGtD
-# mdLZF805GFhPKa3QPkhDJGZ0nPgMJJRmWCtcZBJmzTOT137xrzP+4dFtTljMJelA
-# dvQpsHbHRF0XA9a+4wOtzqESSe3WN2/OXH+b4zCsvvocUXnfcJri+B+qBvcJKA5y
-# kPs88LiUbJ8ReRGyVx8IwD26yd1IXc9vf7jhcScUgZ3aay4PApcgJHkI1pvb4+Af
-# eETvbvsS8JV8wuwQhYv/weMIAWhRAa/FDpWX5s0EDXoPJ1TyYhjHaLjB5IphPcRW
-# uBg2M5oTBlibgw/uph1PFFGYOkNVBZ4IQx16B7/EG8jT0LYrtmzNfbMa07+VabGz
-# 7XJ3EqrBWWNUjCXPLeE/+SbrdYHNeSujunVAUa61LsKzSr+BzTm9Dlyjizk6Limh
-# eaWNjm301Xkc
+# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFH1weWIXu31bJ3Jn+wcG
+# t8yYVtRDMA0GCSqGSIb3DQEBAQUABIICAFq2RX0GoqHUG7WQA1ij1vvhZ4sTPOSD
+# thJEWrYxS/bPsDqdH2u0UE/4p1ETH/b96pEzDNEjXA2/1M6UAH/+LnXWqAFRTnnT
+# dl3ZGO8l+tJF080HXVpYF7SxMVpJ/uU/n0KcYHTySUKBY4BzL9W9JvIwssdXftU4
+# Vb/1mtvewZ8EeG0faXqd0RT1oL+rbPBYuChc3UBZB4PeeoRXDf3prDJDIlrzLvfz
+# g42IMWtyGgTIpOomy6i0JZanpOKFkFz9jppwomIZIlpC2E5jTIQpzopUI5DANJ0f
+# XwnYP1dX2H3ufGp5LmUsEqttR6VkUzqS6iYWR/wls0YQLF44fZDJlYOi8BK39uc3
+# RHf2TBMe8d9foM/yL576G6cZ+6XLyD+iyp0GtWRkFEcfCrCM/7rHYgVFuZhK0qB2
+# T/KUBN88yPawW/5iIRVd8DiCChVc9csmayYcn/sKTSWIK1mL6IaR6Jhz5Y94Xa39
+# NkS41/eHxL9Hi06LECqO5edhoh7SCXrp7J0u68/hMh93CFgGDavGIn4hJ1ag30xd
+# vseoZf4bMNRHggBP35fA80cu4VGY0VGFW5DcBzeAgjTRWJlBLey/mnHLFc9f6DaM
+# /dR8vpiWlI532l9TSYTtEqZ+kMfknO5PQt8I8JcH0l3EBhnz8+ogUUSxi+VI7cWb
+# E7JH7dG+zSnP
 # SIG # End signature block

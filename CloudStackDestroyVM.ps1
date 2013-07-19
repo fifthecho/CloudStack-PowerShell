@@ -1,27 +1,19 @@
 <#
 .SYNOPSIS
-   A CloudStack/CloudPlatform Virtual Machine HA toggling Scriptlet.
+   A CloudStack/CloudPlatform Virtual Machine destruction Scriptlet.
 .DESCRIPTION
-   Alter a virtual machine running within a CloudStack Cloud to be HA Enabled or Disabled..
+   Destroy a CloudStack Virtual Machine
 .PARAMETER instanceid
    The instance ID of the VM.
-.PARAMETER state
-   The state of HA, should be "true" or "false"
-.EXAMPLE
-   CloudStackHAToggle.ps1 -instanceid 2665390c-6ee0-4145-adaa-b9275d715295 -state false
 #>
 # Writen by Jeff Moody (fifthecho@gmail.com)
 #
-# 2013/7/18  v1.0 created
+# 2013/7/19  v1.0 created
 
 Param(
 [Parameter(Mandatory=$true)]
   [String]
   $instanceid
-,
-[Parameter(Mandatory=$true)]
-  [String]
-  $state
 )
 
 Import-Module CloudStackClient
@@ -29,9 +21,8 @@ $parameters = Import-CloudStackConfig
 
 if ($parameters -ne 1) {
 	$cloud = New-CloudStack -apiEndpoint $parameters[0] -apiPublicKey $parameters[1] -apiSecretKey $parameters[2]
-	$job = Get-CloudStack -cloudStack $cloud -command updateVirtualMachine -options id=$instanceid,haenable=$state
-    $hastatus = $job.updatevirtualmachineresponse.virtualmachine.haenable
-    Write-Host "Instance $instanceid has changed its HA status to $hastatus"
+	$job = Get-CloudStack -cloudStack $cloud -command destroyVirtualMachine -options id=$instanceid
+  Write-Host "`nVM $instanceid destroyed."
 	
 }
 else {
@@ -40,8 +31,8 @@ else {
 # SIG # Begin signature block
 # MIIRpQYJKoZIhvcNAQcCoIIRljCCEZICAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUtSvQNpz94mX7TGI7Cwuwy/Ze
-# NA2ggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUu9xig0DTtBFINb0O6pxMK00s
+# hbuggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
 # EwJJTDEWMBQGA1UEChMNU3RhcnRDb20gTHRkLjErMCkGA1UECxMiU2VjdXJlIERp
 # Z2l0YWwgQ2VydGlmaWNhdGUgU2lnbmluZzEpMCcGA1UEAxMgU3RhcnRDb20gQ2Vy
 # dGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDcxMDI0MjIwMTQ2WhcNMTcxMDI0MjIw
@@ -120,17 +111,17 @@ else {
 # aW5nMTgwNgYDVQQDEy9TdGFydENvbSBDbGFzcyAyIFByaW1hcnkgSW50ZXJtZWRp
 # YXRlIE9iamVjdCBDQQICCnYwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwxCjAI
 # oAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIB
-# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFColbt632ntExTyu7T06
-# BWVA+R1BMA0GCSqGSIb3DQEBAQUABIICAIZiQ2/edvrZkzNhhV2Mqw09pqMJml2w
-# gbCD9UCA9Ic/Y6VFzBaxP5mocuDXpeqg11ImllH7BFDVtcxeY709C2glKRf0G13I
-# /WuXzXgQlokFaCTk6KK/QElVj4Sgz3aqAvpt//PKHzr9u1Mg8wN4o/qefB5YmFly
-# M1iZp7J/1ANSMgXwwQKq2/jsXtvw19ZuoiSf9aM4KOOUvIt1iwm/f7Odd+QZq+B1
-# WYlurYoKtEPejnkzjrgn645uOzGtUKDFhWwt0fv/AbELA4cackghJbt9AFCgxGtD
-# mdLZF805GFhPKa3QPkhDJGZ0nPgMJJRmWCtcZBJmzTOT137xrzP+4dFtTljMJelA
-# dvQpsHbHRF0XA9a+4wOtzqESSe3WN2/OXH+b4zCsvvocUXnfcJri+B+qBvcJKA5y
-# kPs88LiUbJ8ReRGyVx8IwD26yd1IXc9vf7jhcScUgZ3aay4PApcgJHkI1pvb4+Af
-# eETvbvsS8JV8wuwQhYv/weMIAWhRAa/FDpWX5s0EDXoPJ1TyYhjHaLjB5IphPcRW
-# uBg2M5oTBlibgw/uph1PFFGYOkNVBZ4IQx16B7/EG8jT0LYrtmzNfbMa07+VabGz
-# 7XJ3EqrBWWNUjCXPLeE/+SbrdYHNeSujunVAUa61LsKzSr+BzTm9Dlyjizk6Limh
-# eaWNjm301Xkc
+# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFO7scvuUTCVhazglz9eP
+# f9y7WWjdMA0GCSqGSIb3DQEBAQUABIICADodc268YJsxzMl7BD6zTtsfQrDbVoz7
+# o6GrlWaN0SdPP/Iu5bZ+Fq1rcA4MxotLlwHdPoJV01ZyXU92fZSjNgHq6utx5scp
+# 66Bxwe84WWoraNGtoYbRoBPB+avoBh8lArMP+QrSjF8R0GLFjNyIy1G2Ygnh3BpV
+# hWKKrtThmeDEleotYMwD9Tl9ZtNsI2w5kTqwCYYRCS782jEKef2kUA5m9SRFUzEe
+# i45dVG9dqtN208RGcAlbJ12vUc/6K7jutSKPeyGymhQjl9K2z5JtJtAvW2P7ystJ
+# o+qZ6xjvcSSj2BAhVhm7mFvWSoNh1o9iJksOBsBlNzf4vVSTRUse3CZUB0op7Qvu
+# yPF6VDaEqpw83RDef+IBkuhAxLKVU4TpNuMSYiEopQzdwkebnL1Kp0SbCzXktFvm
+# ZfUYlX52C8TGwjPTeV8jusRIpKzMOwlGJb4xvsv+M4JrvVjJCVbIxNU21Napivjc
+# SPj2FgEFimKXV564oBQHXj4t2jJlF7rDZZjfH69TwbPoqMPhWbtDc2+ZrNyxBCM1
+# 7ems9AMaTF2IiPvxIjqYLfgPuSY/glK4D0Ln3x+wSwOtY9cmmKZuOLZkS8o8OJwn
+# mOhVDdFXhoBKw3ymEJRm6fNIc31Ska8hzVOieiCxvlNQ2tVzNgSF+7pDkOmMOaee
+# jgvOZn4fDQpI
 # SIG # End signature block
