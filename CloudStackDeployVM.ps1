@@ -64,7 +64,7 @@ if ($parameters -ne 1) {
     do {
       Write-Host -NoNewline "."
       $jobStatus = Get-CloudStack -cloudStack $cloud -command queryAsyncJobResult -options jobid=$jobid
-      Start-Sleep -Seconds 5
+      Start-Sleep -Seconds 2
     }
     while ($jobStatus.queryasyncjobresultresponse.jobstatus -eq 0)
     $statusCode = $jobStatus.queryasyncjobresultresponse.jobresultcode
@@ -88,8 +88,8 @@ else {
 # SIG # Begin signature block
 # MIIRpQYJKoZIhvcNAQcCoIIRljCCEZICAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU9GVow6Y1ODx785oRUkds92tP
-# 08aggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUXqJLmGc+Au1KVtjhcat9DaB2
+# L72ggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
 # EwJJTDEWMBQGA1UEChMNU3RhcnRDb20gTHRkLjErMCkGA1UECxMiU2VjdXJlIERp
 # Z2l0YWwgQ2VydGlmaWNhdGUgU2lnbmluZzEpMCcGA1UEAxMgU3RhcnRDb20gQ2Vy
 # dGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDcxMDI0MjIwMTQ2WhcNMTcxMDI0MjIw
@@ -168,17 +168,17 @@ else {
 # aW5nMTgwNgYDVQQDEy9TdGFydENvbSBDbGFzcyAyIFByaW1hcnkgSW50ZXJtZWRp
 # YXRlIE9iamVjdCBDQQICCnYwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwxCjAI
 # oAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIB
-# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFHmBRzbNCOzgAEm367Gx
-# cAHDxLkLMA0GCSqGSIb3DQEBAQUABIICAFnTVUmnwRSivMcAjDlariXgHc2joezm
-# xIJ9sGePjFR1qbkjopV1d4seQckrkHw1AkTAFhED6PaN63XJFmUg/iDQCNRPWbhn
-# F+AgDuUVEdAFUgPxheJZQXdhuXf7YKVIvH5ohC09ge2V/4n8KkSd4hQRGYcnABSg
-# uBuUno6tBokPlQoAVSo2buLxHlijbx+Lo3DQXEwSpzpzMifSEUA8hWriWjvwWRz1
-# 7SMieOpda9a0AZoGDZhCphFNx/WVGsOzsmf2SkWtQ7FTttRaMvgcuqwc+g0tnTDh
-# 1yc5jxoYIXCZb5ZP/17swxhcNaV4c9a3mPyM5ej3xrrD8ReWkfWvjIKSKdVP6Oec
-# wyE4B5UCg3H+gvV4Vywq2Or87rZI6GpYTJVUdJa5aUs90ABjvxKn3M+6XchFnhim
-# 0ZRwZQ+MwYKajLXID6gjZfPUmauDoVjwjoOA9d33VClyM5/izFJf/uGSjo1VirLj
-# 0Dy78Xf0Onp/fYP5ALoclHzOFVI5xb57IY8qKbkrLk4aqNo+/Bdgqr3g7Jvc1+YM
-# 7GlzG2BftUySZnPv0dFLmpoO8SmyxNPaa2kU5GkpnelFLIU6S1GyRWtPq9Foaa+a
-# CUDwaWtJTF8IPXSoaEbzBdFHa0rAbLiR5WGbWQaiIr8VPwwn0FE8/vtcdWLU9TYw
-# bUON9aTFzVzG
+# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFFzRX6hDNU/0My3Y1T9I
+# i0d99jVPMA0GCSqGSIb3DQEBAQUABIICALxlLLoQugGNd+KKmoeu+xb9myG/xv8w
+# 1QvTAM5PYs1xsyzThESnqSbB5tpL9wvRpfz/x9J7Yxr3HnR0uUWTPn2dKu0O5UFM
+# BxrmZska4CbN5PbXb/2ga5QXkGoxgm/wwLtc6thIEZnmDs1GjaiOocJ1QZ9sIC5S
+# hDGvD5BnGGJDAkW6DvYch49YLH82KurhHqb5aozqNL5LyQ4xdNCRn4DGzV4lPjvu
+# PzmCbFvMHwVDTl9oLE5UMIXNL1Z7iC+uHeLDH6UnSASBCLbrNWGBf01QLQ4qw0sS
+# 7zi6lKYD4CBC7qLKcbcG8xklJHzNIQWVbYXxXgTfJcuUyaZi26QUqjd4cAXtCwPw
+# QF71VnrkLjbGS4mHebc3wBbgmlLtjhj1AKKKzuKi6MF4zReWWs8lqyXc+S6h97IW
+# MkXYbRH3R3ITyMIBs1HDASYuh9Jr05PojkG/Z1xM/+/1DotjtrBvMlFo5ZXFljnk
+# Z3yGYoRFQJLfqKmVV7Q/Hmuam5WkfhW77QHyXzuvIl2I1qZHaBiHixdDO2WtyyCV
+# DktLWE/VgcUQJtM9MItdZwgr5KVxzYvdABAWg1nBLSNJ08z65Kvnl8YawHOzRf/H
+# Z4t61PWIiqCMC0C2UuTTOKzitudsgQvdCSLP/9HT8+Bsj4IccTnxZEI+MnzU84xu
+# Hz//mdJHLQc5
 # SIG # End signature block
