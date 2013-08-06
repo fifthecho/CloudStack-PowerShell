@@ -40,7 +40,7 @@ if ($parameters -ne 1) {
         if ($snapshotListJob.listsnapshotsresponse.count){
             $count = $snapshotListJob.listsnapshotsresponse.count
         }
-        Write-Host "DATADISK Volume $volumeName has $count snapshots"
+        Write-Host "DATADISK Volume $volumeName (ID: $volumeID) has $count snapshots"
     }
 }
 else {
