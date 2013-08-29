@@ -15,13 +15,13 @@ Import-Module CloudStackClient
 $parameters = Import-CloudStackConfig
 
 if ($parameters -ne 1) {
-	$cloud = New-CloudStack -apiEndpoint $parameters[0] -apiPublicKey $parameters[1] -apiSecretKey $parameters[2]
-    $volumeListJob = Get-CloudStack -cloudStack $cloud -command listVolumes -options type=ROOT
+	$cloud = New-CloudStackReports -apiEndpoint $parameters[0] -apiPublicKey $parameters[1] -apiSecretKey $parameters[2]
+    $volumeListJob = Get-CloudStackReports -cloudStack $cloud -command listVolumes -options type=ROOT
     $volumes = $volumeListJob.listvolumesresponse.volume 
     foreach($v in $volumes){
         $volumeID = $v.id
         $volumeName = $v.name
-        $snapshotListJob = Get-CloudStack -cloudStack $cloud -command listSnapshots -options volumeid=$volumeID
+        $snapshotListJob = Get-CloudStackReports -cloudStack $cloud -command listSnapshots -options volumeid=$volumeID
         $snaps = $snapshotListJob.listsnapshotresponse
         $count = 0
         if ($snapshotListJob.listsnapshotsresponse.count){
@@ -29,12 +29,12 @@ if ($parameters -ne 1) {
         }
         Write-Host "ROOT Volume $volumeName (ID: $volumeID) has $count snapshots"
     }
-    $volumeListJob = Get-CloudStack -cloudStack $cloud -command listVolumes -options type=DATADISK
+    $volumeListJob = Get-CloudStackReports -cloudStack $cloud -command listVolumes -options type=DATADISK
     $volumes = $volumeListJob.listvolumesresponse.volume 
     foreach($v in $volumes){
         $volumeID = $v.id
         $volumeName = $v.name
-        $snapshotListJob = Get-CloudStack -cloudStack $cloud -command listSnapshots -options volumeid=$volumeID
+        $snapshotListJob = Get-CloudStackReports -cloudStack $cloud -command listSnapshots -options volumeid=$volumeID
         $snaps = $snapshotListJob.listsnapshotresponse
         $count = 0
         if ($snapshotListJob.listsnapshotsresponse.count){
@@ -49,8 +49,8 @@ else {
 # SIG # Begin signature block
 # MIIRpQYJKoZIhvcNAQcCoIIRljCCEZICAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUvYyw3TI6tpgwFSB3ZtQeX1N/
-# +WKggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUJPOTaOBIMMtTORC7FtorZeBk
+# D1mggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
 # EwJJTDEWMBQGA1UEChMNU3RhcnRDb20gTHRkLjErMCkGA1UECxMiU2VjdXJlIERp
 # Z2l0YWwgQ2VydGlmaWNhdGUgU2lnbmluZzEpMCcGA1UEAxMgU3RhcnRDb20gQ2Vy
 # dGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDcxMDI0MjIwMTQ2WhcNMTcxMDI0MjIw
@@ -129,17 +129,17 @@ else {
 # aW5nMTgwNgYDVQQDEy9TdGFydENvbSBDbGFzcyAyIFByaW1hcnkgSW50ZXJtZWRp
 # YXRlIE9iamVjdCBDQQICCnYwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwxCjAI
 # oAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIB
-# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFOBTaMUnZHwRyZY6F8ID
-# +MmA1eiGMA0GCSqGSIb3DQEBAQUABIICAIQjMVMzIMNOo4ap+g2+vMqURWkvGOpG
-# SfcjRzlH7N00ZG6+T+O7k8ayq7Yii6Ot3VEAVYDMLXLfeNi6vih3cMkn7gBqzyu3
-# WvsG8koQ4Z/zSfXdAsD76Bx8APStlZ9lfrP1vP/c4yXijy3NGV4HTU6HHE/YJ4Lg
-# W7iU1voZzPTXZoQ8xVDGasP3Bp3JTRshd9NLyAUwofwn6eViZR0KlyxaXmsU0QFC
-# JXEivCQh3SI0zGmIi3LlHlbyGl+9gmVKB4C2G4+KbLKBRsXqFfZTbTcBY7oIzEU3
-# 2LyX8lLZ+A1R7il6VC5ADNimz7E2Hav8t25om0RimJWWa9MdsnGroLiZXRQoSnX+
-# e4j6GDKUJWihLMFqfuckeeWfv7XRQr29G4Fc++JsOoZVbLsA/3KIuPWMo0Vcmj4Z
-# dr5HGh8f1Qf/6nAOoXkOoF0nW63kSryQ9DO9C/ANc7sHH08J4XcAtHELjwoseOcp
-# rIAxojCNi2N1QMVygN41eO3IXtNDcVqi8OzS6pnCofaSZrP78VL4B0qsusZoEz9o
-# eF4I9BjM8eb51oHxdLnPtot1/HktsoHBtBY32nGKj5LDGeslZeI/SXu426v/DrnK
-# lBykiNL/sfVU8u6uqEIdKf1TUO3jn4nYoAa3qZM0i7vqGXJh/Jnc5BrRPJ/iyVpY
-# 9MT6I+VSv+8t
+# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFL6rG/dTkmbNoibGc61i
+# xfFmLz29MA0GCSqGSIb3DQEBAQUABIICALmNL3A8WPWWCvc2fkF4TI26FDYFxQ0G
+# ZnT37f1nTRt5gMGhi4xJV3Jtng0gGioUMoawsHj534ksfFB0O9zcIST+kbqYfhxN
+# wnhp9NnlqwZrymiMCX3cu/Z9/7bhs2XW3mkLIGsuNaT52gfdgbPR+UsPK1gmlx5F
+# L2j3/OAulg7JJyHOsElferapsI6VRG8s7fUn7fLoxiokb1BHExQ+mG1IcCEcaYEN
+# 66/98iqIDf9lFctkYw7RUkmfC8cgTacqb30ssy9AwaS1A1A+F4AlN00s0o9UE3Jr
+# VvHayK3pF1h/jfn0Z+nW4gPRSViub5LWImsWjird9RAe3KuCFK7i0xGgKTwRvKw8
+# 3751IrB+mTFiU3GnwPUnuVlsaWdE7yoQbw9Yuz7h3CLGLYQo3zQFWaXkbyus2rEG
+# T+sIH/LEwDIBadxeEEeBYRGr472q12QSvq/3qsrLPvdiS0igepBJHDZCenHUzrbE
+# bdPR/vgPdxbJyr2reTQt/khDc8tVP3oDcRSJ/42B/ErdtnPsSxAXnSShPc5I2Kbw
+# FNNUMl4ZOKQaBUxu3/xKkijOfetPmimNEPK4CmmaBYRaPP0M80GxBcdgIvTBReJY
+# rWdVt9MOIhKxboKeCMLrbntGsFaQ5GSpvzdJw8fgUSX8HhG8142ctJS0MnF6r3PH
+# X3P40F43u80g
 # SIG # End signature block
