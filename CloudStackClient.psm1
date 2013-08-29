@@ -174,7 +174,7 @@ function Get-CloudStackUserData{
         $userdata
     )
     Write-Debug "User Data: $userdata"
-    $userdatab64 = [System.Convert]::ToBase64String([System.Text.Encoding]::UNICODE.GetBytes($userdata))
+    $userdatab64 = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($userdata))
     Write-Debug "Base64 Encoded User Data: $userdatab64"
     $encodeduserdata = [System.Web.HttpUtility]::UrlEncode($userdatab64)
     return $encodeduserdata
@@ -183,8 +183,8 @@ Export-ModuleMember -Function Get-CloudStackUserData
 # SIG # Begin signature block
 # MIIRpQYJKoZIhvcNAQcCoIIRljCCEZICAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUr37o6QHJVVJSUjbAzK3wzLH6
-# 92aggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUzhpxfbcOGV88r3DoySUrYUS9
+# EU+ggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
 # EwJJTDEWMBQGA1UEChMNU3RhcnRDb20gTHRkLjErMCkGA1UECxMiU2VjdXJlIERp
 # Z2l0YWwgQ2VydGlmaWNhdGUgU2lnbmluZzEpMCcGA1UEAxMgU3RhcnRDb20gQ2Vy
 # dGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDcxMDI0MjIwMTQ2WhcNMTcxMDI0MjIw
@@ -263,17 +263,17 @@ Export-ModuleMember -Function Get-CloudStackUserData
 # aW5nMTgwNgYDVQQDEy9TdGFydENvbSBDbGFzcyAyIFByaW1hcnkgSW50ZXJtZWRp
 # YXRlIE9iamVjdCBDQQICCnYwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwxCjAI
 # oAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIB
-# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFHAMaL2lCstwAkCNfdQb
-# NLoQRyIDMA0GCSqGSIb3DQEBAQUABIICAAzYYcENPv9rYoC5rbgA80VhXU6qgpM8
-# cQocpvLtVXK/YP9w0DnBBNQJUoaFMut10deHWNPpQg6m3JDJA4vymAzYItBR7oss
-# dYigxHMc/9DHho67QExea0TAMDrWFpbdKck+A5LQLbzZ4YA0PprCVrOsTHR6Tmiz
-# aJYIUtbMulGOVFkeRl4eP0NFiHl7x+j1eEGK4capmpMm1xYxVpNaBOiwfuyP/qR/
-# 5ooNtJAFeKzFe+E/aI5TP584hU0mYvujOOAK+fv4lRjNPTeNdH0y0p5PJw6hVp/R
-# trzZcFt051P3ll6jTnID/kLH/IE0wpM8vujGjFINWWi7ZwSoqtAPtwIGUth/GdYX
-# xN7bB32HRfASIduioSx6AaS22Hxzdys/RMh8+0Zuyv4KpMu1y9wJl9j6xglzE92z
-# rf2EVrKeq5rCGok3khww3nspnD5zOhL6o6Snccj/ub8+IBzYTpCsipR+jXpymvIe
-# jahKvYY1KYa22NJ5doNCbSbXJWj3mUyuYl9cKcGo2kpCumEuWIiBOCAE402khf/6
-# fX7CaUWanGsllsHf8c//RxeWPuErSelwzI/Sm++Lq8ZeZp/WAmSMmPVDh7QUWT1U
-# hek234HCOly+MUz3xCqiJaGHQonZlUfOp+nvdIs4UrNARit+wzAADj755gfrdSfj
-# 2QevjbcIm0vc
+# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFJ95JOT7GNsFUDAjGfCy
+# pddiODWIMA0GCSqGSIb3DQEBAQUABIICAIm1KQwOlYW4sap3MjzXFdNk/8O3zhsQ
+# EkRocjIn1rs5+JDUX+4U74MtZV7CwylutiEsIGXeJTy306qwhIyOO1QPCNwSFoYp
+# ZZPGN4hB2JGFuoyuz/GLy3HMkYbJNEhKXdck8P3tJajbDn7bkRumr2kbTbxsDObC
+# vzU7pwjw1Oon9KSx8Ot0+ayD5O1CT5LmeLarGpNB2KbCA991aBUgszFtKWM9Qf5J
+# l79QhejVo2+v5vCza2JcMU14KnvS42ajW3pS2p6Zgii0fsDEh8Uhehin3NrLuCT3
+# V+pB53BEtCpbsMbrg4bERas/nLhKQ9WBwtBHNuGjG9GsIffpRX8Dbo7pq4QPOihx
+# +1ULi+jyoKLUzAa2goWSRCf680DwMLOICPbkl0VElpY6+nuycFSlN6oagPQfCRSm
+# rbY12YMKFYFFDQcnmRRVuodbbrdZ9GKqoBAeIBh6mfLVJpA+iNYquYFHtaPuovtR
+# SpWP4sysFzFEOnS6d2erpCuyyDDQLAPcUWPgcsE8IO2uJLAoB38fwsTlyNiGUSn8
+# 4zgljTMhX16hcQVvD4PcNSqmfFmgpGegxsrvexHTVBMQ3ojZmS7jJiWeO+LqjHbE
+# qSAev0fk+EbtfppFEwNFigmWYJ8V930at/45fHvTwj7JzhMa8neufYDP0WwXrzMI
+# 92wnGrh0kDD+
 # SIG # End signature block
