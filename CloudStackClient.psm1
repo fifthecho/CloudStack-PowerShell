@@ -7,8 +7,7 @@
    The command parameter is MANDATORY and specifies which command you are wanting to run against the API.
 .PARAMETER options
    Optional command options that can be passed in to commands.
-.EXAMPLE
-   CloudStackClient.ps1 -command listVirtualMachines -options zoneid=c3132929-9e55-443c-bce1-33b73faef801
+
 #>
 # Writen by Jeff Moody (fifthecho@gmail.com)
 # Based off code written by Takashi Kanai (anikundesu@gmail.com)
@@ -17,95 +16,101 @@
 # 2013/5/13  v1.1 created to work with CloudPlatform 3.0.6 and migrated to entirely new codebase for maintainability and readability.
 # 2013/5/17  v2.0 created to modularize everything.
 # 2013/6/20  v2.1 created to add Powershell 2 support
+# 2013/9/03  v2.5 created to add better error handling
 
 [VOID][System.Reflection.Assembly]::Load("System.Web, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a");
 $WebClient = New-Object net.WebClient
 
 function New-CloudStack{
-	Param(
-			[Parameter(Mandatory = $true)]
-	        [String] $apiEndpoint
-		,
-			[Parameter(Mandatory = $true)]
-	        [String] $apiPublicKey
-		,
-	        [Parameter(Mandatory = $true)]
-	        [String] $apiSecretKey
-		)
-	$cloudStack = @()
-	$cloudStack += $apiEndpoint
-	$cloudStack += $apiPublicKey
-	$cloudStack += $apiSecretKey
-	return $cloudStack
+    Param(
+            [Parameter(Mandatory = $true)]
+            [String] $apiEndpoint
+        ,
+            [Parameter(Mandatory = $true)]
+            [String] $apiPublicKey
+        ,
+            [Parameter(Mandatory = $true)]
+            [String] $apiSecretKey
+        )
+    $cloudStack = @()
+    $cloudStack += $apiEndpoint
+    $cloudStack += $apiPublicKey
+    $cloudStack += $apiSecretKey
+    return $cloudStack
 }
 Export-ModuleMember -Function New-CloudStack
 
 function calculateSignature{
-	Param(
-		[Parameter(Mandatory=$true)]
-		[String[]]
-		$SECRET_KEY
-	,
-		[Parameter(Mandatory=$true)]
-		[String]
-	    $HASH_STRING
-	)
-	Write-Debug("Hash String:  $HASH_STRING")
-	Write-Debug("Signature:    $SECRET_KEY")
-	$HMAC_SHA1 = New-Object System.Security.Cryptography.HMACSHA1
-	$HMAC_SHA1.key = [Text.Encoding]::ASCII.GetBytes($SECRET_KEY)
-	$Digest = $HMAC_SHA1.ComputeHash([Text.Encoding]::ASCII.GetBytes($HASH_STRING))
-	$Base64Digest = [System.Convert]::ToBase64String($Digest)  
-	$signature = [System.Web.HttpUtility]::UrlEncode($Base64Digest)
-	
-	Write-Debug("Digest:       $Base64Digest")
-	Write-Debug("Signature:    $signature")
-	return $signature
+    Param(
+        [Parameter(Mandatory=$true)]
+        [String[]]
+        $SECRET_KEY
+    ,
+        [Parameter(Mandatory=$true)]
+        [String]
+        $HASH_STRING
+    )
+    Write-Debug("Hash String:  $HASH_STRING")
+    Write-Debug("Signature:    $SECRET_KEY")
+    $HMAC_SHA1 = New-Object System.Security.Cryptography.HMACSHA1
+    $HMAC_SHA1.key = [Text.Encoding]::ASCII.GetBytes($SECRET_KEY)
+    $Digest = $HMAC_SHA1.ComputeHash([Text.Encoding]::ASCII.GetBytes($HASH_STRING))
+    $Base64Digest = [System.Convert]::ToBase64String($Digest)  
+    $signature = [System.Web.HttpUtility]::UrlEncode($Base64Digest)
+    
+    Write-Debug("Digest:       $Base64Digest")
+    Write-Debug("Signature:    $signature")
+    return $signature
 }
 
 
 function Get-CloudStack{
-	Param(
-		[Parameter(Mandatory=$true)]
-		[String[]]
-		$cloudStack
-	,
-		[Parameter(Mandatory=$true)]
-		[String]
-	    $command
-	,
-		[String[]]
-	    $options
-	)
-	
-	$ADDRESS = $cloudStack[0]
-	$API_KEY = $cloudStack[1]
-	$SECRET_KEY = $cloudStack[2]
-	$URL=$ADDRESS+"?apikey="+($API_KEY)+"&"+"command="+$command
-	$optionString="apikey="+($API_KEY)+"&"+"command="+$command
-	$options += "response=xml"
+    Param(
+        [Parameter(Mandatory=$true)]
+        [String[]]
+        $cloudStack
+    ,
+        [Parameter(Mandatory=$true)]
+        [String]
+        $command
+    ,
+        [String[]]
+        $options
+    )
+    
+    $ADDRESS = $cloudStack[0]
+    $API_KEY = $cloudStack[1]
+    $SECRET_KEY = $cloudStack[2]
+    $URL=$ADDRESS+"?apikey="+($API_KEY)+"&"+"command="+$command
+    $optionString="apikey="+($API_KEY)+"&"+"command="+$command
+    $options += "response=xml"
     $options = $options | Sort-Object
-	foreach($o in $options){
-	    $o = $o -replace " ", "%20"
-	    $optionString += "&"+$o
+    foreach($o in $options){
+        $o = $o -replace " ", "%20"
+        $optionString += "&"+$o
         $URL += "&"+$o
-	}
+    }
     Write-Debug("Pre-signed URL: $URL")
     Write-Debug("Option String: $optionString")
-	$signature = calculateSignature -SECRET_KEY $SECRET_KEY -HASH_STRING $optionString.ToLower()
-	$URL += "&signature="+$signature
-	Write-Debug("URL: $URL")
+    $signature = calculateSignature -SECRET_KEY $SECRET_KEY -HASH_STRING $optionString.ToLower()
+    $URL += "&signature="+$signature
+    Write-Debug("URL: $URL")
     $Response = ""
     try {
-        if ($psversiontable.psversion.Major -ge 3) {
-    	    $Response = Invoke-RestMethod -Uri $URL -Method Get
+       if ($psversiontable.psversion.Major -ge 3) {
+            $Response = Invoke-RestMethod -Uri $URL -Method Get -ErrorAction Stop -ErrorVariable ErrorOut
+            Write-Debug $Response
         }
         else {
             $httpWebRequest = [System.Net.WebRequest]::Create($URL);
             $httpWebRequest.Method = "GET";  
             $httpWebRequest.Headers.Add("Accept-Language: en-US");
-
-            $httpWebResponse = $httpWebRequest.GetResponse();
+            try {
+                $httpWebResponse = $httpWebRequest.GetResponse();
+            }
+            catch [System.Net.WebException] {
+                $ErrorOut = $_.Exception.Response
+            }
             $responseStream = $httpWebResponse.GetResponseStream();
             $streamReader = New-Object System.IO.StreamReader($responseStream);
             $temp = $streamReader.ReadToEnd();
@@ -114,55 +119,62 @@ function Get-CloudStack{
             $responseStream.Close();
             $streamReader.Close();
             $httpWebResponse.Close(); 
+            Write-Debug $Response
         }
     }
     catch{
         Write-Error "ERROR!"
-        Write-Error $Error[0]
-
+        $errorType = $ErrorOut.GetType()
+        if ($errorType.Name -eq "ArrayList") {
+            Write-Error $ErrorOut[0]
+        }
+        else {
+            Write-Error $ErrorOut
+        }
+        Write-Error "If this is unclear, please go to $URL in a browser for the API response."
     }
     Write-Debug "Response: $Response"
-	return $Response
-	
+    return $Response
+    
 }
 
 Export-ModuleMember -Function Get-CloudStack
 
 function Import-CloudStackConfig{
-	# Read configuration values for API Endpoint and keys
-	$ChkFile = "$env:userprofile\cloud-settings.txt" 
-	$FileExists = (Test-Path $ChkFile -PathType Leaf)
+    # Read configuration values for API Endpoint and keys
+    $ChkFile = "$env:userprofile\cloud-settings.txt" 
+    $FileExists = (Test-Path $ChkFile -PathType Leaf)
 
-	If (!($FileExists)) 
-	{
-		Write-Error "Config file does not exist. Writing a basic config that you now need to customize."
+    If (!($FileExists)) 
+    {
+        Write-Error "Config file does not exist. Writing a basic config that you now need to customize."
         Write-Output "[general]`n" | Out-File $ChkFile
         Add-Content $ChkFile "Address=http://(your URL):8080/client/api`n"
         Add-Content $ChkFile "ApiKey=(Your API Key)`n"
         Add-Content $ChkFile "SecretKey=(Your Secret Key)"
-		Return 1
-	}
-	ElseIf ($FileExists)
-	{
-		Get-Content "$env:userprofile\cloud-settings.txt" | foreach-object -begin {$h=@{}} -process { $k = [regex]::split($_,'='); if(($k[0].CompareTo("") -ne 0) -and ($k[0].StartsWith("[") -ne $True)) { $h.Add($k[0], $k[1]) } }
-		$ADDRESS=$h.Get_Item("Address")
-		$API_KEY=$h.Get_Item("ApiKey")
-		$SECRET_KEY=$h.Get_Item("SecretKey")
-		Write-Debug "Address: $ADDRESS"
-		Write-Debug "API Key: $API_KEY"
-		Write-Debug "Secret Key: $SECRET_KEY"
-		$config = @()
-		$config += $ADDRESS
-		$config += $API_KEY
-		$config += $SECRET_KEY
-		if (($ADDRESS -ne "http://(your URL:8080/client/api?") -and ($API_KEY -ne "(Your API Key)") -and ($SECRET_KEY -ne "(Your Secret Key)")) {
-			return $config
-		}
-		else {
-			Write-Error "Please configure the $env:userprofile\cloud-settings.txt file"
-			return 1
-		}
-	}
+        Return 1
+    }
+    ElseIf ($FileExists)
+    {
+        Get-Content "$env:userprofile\cloud-settings.txt" | foreach-object -begin {$h=@{}} -process { $k = [regex]::split($_,'='); if(($k[0].CompareTo("") -ne 0) -and ($k[0].StartsWith("[") -ne $True)) { $h.Add($k[0], $k[1]) } }
+        $ADDRESS=$h.Get_Item("Address")
+        $API_KEY=$h.Get_Item("ApiKey")
+        $SECRET_KEY=$h.Get_Item("SecretKey")
+        Write-Debug "Address: $ADDRESS"
+        Write-Debug "API Key: $API_KEY"
+        Write-Debug "Secret Key: $SECRET_KEY"
+        $config = @()
+        $config += $ADDRESS
+        $config += $API_KEY
+        $config += $SECRET_KEY
+        if (($ADDRESS -ne "http://(your URL:8080/client/api?") -and ($API_KEY -ne "(Your API Key)") -and ($SECRET_KEY -ne "(Your Secret Key)")) {
+            return $config
+        }
+        else {
+            Write-Error "Please configure the $env:userprofile\cloud-settings.txt file"
+            return 1
+        }
+    }
 }
 
 Export-ModuleMember -Function Import-CloudstackConfig
@@ -183,8 +195,8 @@ Export-ModuleMember -Function Get-CloudStackUserData
 # SIG # Begin signature block
 # MIIRpQYJKoZIhvcNAQcCoIIRljCCEZICAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUzhpxfbcOGV88r3DoySUrYUS9
-# EU+ggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUPcjDg3UGE3jVF/oqG+qklaq8
+# Tv+ggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
 # EwJJTDEWMBQGA1UEChMNU3RhcnRDb20gTHRkLjErMCkGA1UECxMiU2VjdXJlIERp
 # Z2l0YWwgQ2VydGlmaWNhdGUgU2lnbmluZzEpMCcGA1UEAxMgU3RhcnRDb20gQ2Vy
 # dGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDcxMDI0MjIwMTQ2WhcNMTcxMDI0MjIw
@@ -263,17 +275,17 @@ Export-ModuleMember -Function Get-CloudStackUserData
 # aW5nMTgwNgYDVQQDEy9TdGFydENvbSBDbGFzcyAyIFByaW1hcnkgSW50ZXJtZWRp
 # YXRlIE9iamVjdCBDQQICCnYwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwxCjAI
 # oAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIB
-# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFJ95JOT7GNsFUDAjGfCy
-# pddiODWIMA0GCSqGSIb3DQEBAQUABIICAIm1KQwOlYW4sap3MjzXFdNk/8O3zhsQ
-# EkRocjIn1rs5+JDUX+4U74MtZV7CwylutiEsIGXeJTy306qwhIyOO1QPCNwSFoYp
-# ZZPGN4hB2JGFuoyuz/GLy3HMkYbJNEhKXdck8P3tJajbDn7bkRumr2kbTbxsDObC
-# vzU7pwjw1Oon9KSx8Ot0+ayD5O1CT5LmeLarGpNB2KbCA991aBUgszFtKWM9Qf5J
-# l79QhejVo2+v5vCza2JcMU14KnvS42ajW3pS2p6Zgii0fsDEh8Uhehin3NrLuCT3
-# V+pB53BEtCpbsMbrg4bERas/nLhKQ9WBwtBHNuGjG9GsIffpRX8Dbo7pq4QPOihx
-# +1ULi+jyoKLUzAa2goWSRCf680DwMLOICPbkl0VElpY6+nuycFSlN6oagPQfCRSm
-# rbY12YMKFYFFDQcnmRRVuodbbrdZ9GKqoBAeIBh6mfLVJpA+iNYquYFHtaPuovtR
-# SpWP4sysFzFEOnS6d2erpCuyyDDQLAPcUWPgcsE8IO2uJLAoB38fwsTlyNiGUSn8
-# 4zgljTMhX16hcQVvD4PcNSqmfFmgpGegxsrvexHTVBMQ3ojZmS7jJiWeO+LqjHbE
-# qSAev0fk+EbtfppFEwNFigmWYJ8V930at/45fHvTwj7JzhMa8neufYDP0WwXrzMI
-# 92wnGrh0kDD+
+# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFAFtr3kv2I/tFMpABPaw
+# NqaH1ZbgMA0GCSqGSIb3DQEBAQUABIICAJvuWaDQeUqDCMXKKnD0JmGc/oHP+byV
+# 65rnNNAczPlxlnP5HOu1Su2qbkd+G4B0IexWSEQbHHqQa7lT1APmImiuLcxTtsQz
+# 2PnNizvA7HzgA8aa8Iayok1AApYmSEHuAAJXEf7qp4IOkzHYS8ThrOWUXGIhJQVT
+# 4uHxD2CZLwEbpmd1h3yWmt487ApBfDP0SmDSmp0VmnlToKhlrXbO2fD9OpV/75AN
+# D+VcdVwUpfMGbujYxw8tiyHPAESj8c579P4yBmbezvSf6Ld5KdINEL2VJiklH2Gv
+# +52pY7kyzIYdy01AiphqoJrvkYV+g9VCohl0/OvxAaXZB1vWITrricn3yyJNzs3g
+# Phy+Mbi/WhfsJkyxGVVUY0rpGtDYlKf2MB8SjICF0CUS2fFhalNwsSGGkaIx4pel
+# r4PNGAEgHpwgzyWDZ41SlOzucjqmvLPXEWzWmQwhugDajrvwGb7LaxlkfCfAJXaY
+# nzoQoCCaeF8L35+7bo9nyVsI/fESCnTbDoWf9LH4QbYOLgWOkQLooCODVlxYLbRo
+# WsfX5l6rePcCtLBoOLGTrNLhAHPqLoR0wQ7eSEf07XcwOuwpo/bmLfo6WfqJAmOz
+# /saCE2yWxZeTRRlcUWyYc7TDBHD82uBkvW100RjI3O+y39kPM0tE4pnsW9br8JsG
+# QnhcrnyGdQwB
 # SIG # End signature block
