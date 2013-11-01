@@ -149,9 +149,9 @@ function Import-CloudStackConfig{
     {
         Write-Error "Config file does not exist. Writing a basic config that you now need to customize."
         Write-Output "[general]`n" | Out-File $ChkFile
-        Add-Content $ChkFile "Address=http://(your URL):8080/client/api`n"
-        Add-Content $ChkFile "ApiKey=(Your API Key)`n"
-        Add-Content $ChkFile "SecretKey=(Your Secret Key)"
+        Write-Output "Address=http://(your URL):8080/client/api`n" | Out-File -Append $ChkFile
+        Write-Output "ApiKey=(Your API Key)`n" | Out-File -Append $ChkFile
+        Write-Output "SecretKey=(Your Secret Key)" | Out-File -Append $ChkFile
         Return 1
     }
     ElseIf ($FileExists)
@@ -195,8 +195,8 @@ Export-ModuleMember -Function Get-CloudStackUserData
 # SIG # Begin signature block
 # MIIRpQYJKoZIhvcNAQcCoIIRljCCEZICAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUPcjDg3UGE3jVF/oqG+qklaq8
-# Tv+ggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUEeT6811QixaRHhyJD4NmUsVz
+# MVWggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
 # EwJJTDEWMBQGA1UEChMNU3RhcnRDb20gTHRkLjErMCkGA1UECxMiU2VjdXJlIERp
 # Z2l0YWwgQ2VydGlmaWNhdGUgU2lnbmluZzEpMCcGA1UEAxMgU3RhcnRDb20gQ2Vy
 # dGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDcxMDI0MjIwMTQ2WhcNMTcxMDI0MjIw
@@ -275,17 +275,17 @@ Export-ModuleMember -Function Get-CloudStackUserData
 # aW5nMTgwNgYDVQQDEy9TdGFydENvbSBDbGFzcyAyIFByaW1hcnkgSW50ZXJtZWRp
 # YXRlIE9iamVjdCBDQQICCnYwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwxCjAI
 # oAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIB
-# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFAFtr3kv2I/tFMpABPaw
-# NqaH1ZbgMA0GCSqGSIb3DQEBAQUABIICAJvuWaDQeUqDCMXKKnD0JmGc/oHP+byV
-# 65rnNNAczPlxlnP5HOu1Su2qbkd+G4B0IexWSEQbHHqQa7lT1APmImiuLcxTtsQz
-# 2PnNizvA7HzgA8aa8Iayok1AApYmSEHuAAJXEf7qp4IOkzHYS8ThrOWUXGIhJQVT
-# 4uHxD2CZLwEbpmd1h3yWmt487ApBfDP0SmDSmp0VmnlToKhlrXbO2fD9OpV/75AN
-# D+VcdVwUpfMGbujYxw8tiyHPAESj8c579P4yBmbezvSf6Ld5KdINEL2VJiklH2Gv
-# +52pY7kyzIYdy01AiphqoJrvkYV+g9VCohl0/OvxAaXZB1vWITrricn3yyJNzs3g
-# Phy+Mbi/WhfsJkyxGVVUY0rpGtDYlKf2MB8SjICF0CUS2fFhalNwsSGGkaIx4pel
-# r4PNGAEgHpwgzyWDZ41SlOzucjqmvLPXEWzWmQwhugDajrvwGb7LaxlkfCfAJXaY
-# nzoQoCCaeF8L35+7bo9nyVsI/fESCnTbDoWf9LH4QbYOLgWOkQLooCODVlxYLbRo
-# WsfX5l6rePcCtLBoOLGTrNLhAHPqLoR0wQ7eSEf07XcwOuwpo/bmLfo6WfqJAmOz
-# /saCE2yWxZeTRRlcUWyYc7TDBHD82uBkvW100RjI3O+y39kPM0tE4pnsW9br8JsG
-# QnhcrnyGdQwB
+# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFGMVlQXV8gFPTQ6hVgLr
+# Vd5bA5y+MA0GCSqGSIb3DQEBAQUABIICAIrTyzBx8U/vhMAotK5y/o5+ilGQLctq
+# w2q20FauW9oT7+IYSpkJiKolrtxvBGqf//2p0ObKZ+1VTP6KUIlmUnavGGfFXSaP
+# qccyYt0FSPeGq1j+wyFqKfcEMq+lYRxLooZGA+V9QSd2NK7NS2i5247uvF3rIvw0
+# ST3/McV3bgm2Nmt4tTo1eGpRpXX61/wi7UhX/+ZW1vF9gVj/0zh8wfLJTzL3itjz
+# QTGIb7YKCCM3rveqkkkG/ptAx9Zs3wze+HfRdlJkn0iyXHcQky0bbhCMzIuGbbFb
+# ADVur2cTeWwzSy0kgE1SLGyq7l7YyBLq3E65qA5UAN2reDTpBgPbi437qutoHtU5
+# TGtdSXaoeVG89++mammZew6aNaCfyg3xBwmnDZ5JT+PwFC9Uhj1nHPmgzZwYor7b
+# cwZjEmDrq/T9bWmDIq+tsg7BubZSyxF79mnMUepiq+D3/ECp1fSbDUIOS0EOUFer
+# OVcf30Kp83nfRQK4q/ST54PKrm8qp0Mnq7e7LTpKTX2iJM2eE5dO23fL3Ey+o+CI
+# qyvTQdxty+cR6UflofFKfliLPU5umZmvoCWXFH86B4tCaoS010hE1l/dzZnM/W09
+# xtH2L2bKgbX7aH1XAAm9ud4oerBsWkh5Z30zH3DVTYmBS2R45ou3kcyF71uyphWC
+# rpcryQxJAkt5
 # SIG # End signature block
