@@ -1,10 +1,10 @@
 ﻿<#
 .SYNOPSIS
-   A CloudStack/CloudPlatform Zone Listing Scriptlet.
+   A CloudStack/CloudPlatform Service Offering Listing Scriptlet.
 .DESCRIPTION
-   List all Zones of a CloudStack Cloud.
+   List all Service Offerings of a CloudStack Cloud.
 .EXAMPLE
-   CloudStackListZones.ps1 
+   CloudStackListServiceOfferings.ps1 
 #>
 # Writen by Jeff Moody (fifthecho@gmail.com)
 #
@@ -15,24 +15,24 @@ $parameters = Import-CloudStackConfig
 
 if ($parameters -ne 1) {
 	$cloud = New-CloudStack -apiEndpoint $parameters[0] -apiPublicKey $parameters[1] -apiSecretKey $parameters[2]
-    $job = Get-CloudStack -cloudStack $cloud -command listZones
-	$zones = $job.listzonesresponse
+    $job = Get-CloudStack -cloudStack $cloud -command listServiceOfferings
+	$serviceofferings = $job.listserviceofferingsresponse
 
-	foreach ($ZONE in $zones.zone) {
-        $ZONEID = $ZONE.id
-        $ZONENAME = $ZONE.name
-		Write-Host("Zone `"$ZONENAME`" is associated with Zone ID $ZONEID")
+	foreach ($SERVICEOFFERING in $serviceofferings.serviceoffering) {
+        $SERVICEOFFERINGID = $SERVICEOFFERING.id
+        $SERVICEOFFERINGNAME = $SERVICEOFFERING.name
+        $SERVICEOFFERINGDISPLAY = $SERVICEOFFERING.displaytext
+		Write-Host("Service Offering `"$SERVICEOFFERINGNAME`" is associated with Service Offering ID $SERVICEOFFERINGID and has the parameters of $SERVICEOFFERINGDISPLAY")
 	}
 }
 else {
 	Write-Error "Please configure the $env:userprofile\cloud-settings.txt file"
 }
-
 # SIG # Begin signature block
 # MIIRpQYJKoZIhvcNAQcCoIIRljCCEZICAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUCgwbsx32+hvKSdRr9DvxCpWW
-# J7Gggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU8T6vG/x/2/8xmIza4z95jzZD
+# MmGggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
 # EwJJTDEWMBQGA1UEChMNU3RhcnRDb20gTHRkLjErMCkGA1UECxMiU2VjdXJlIERp
 # Z2l0YWwgQ2VydGlmaWNhdGUgU2lnbmluZzEpMCcGA1UEAxMgU3RhcnRDb20gQ2Vy
 # dGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDcxMDI0MjIwMTQ2WhcNMTcxMDI0MjIw
@@ -111,17 +111,17 @@ else {
 # aW5nMTgwNgYDVQQDEy9TdGFydENvbSBDbGFzcyAyIFByaW1hcnkgSW50ZXJtZWRp
 # YXRlIE9iamVjdCBDQQICCnYwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwxCjAI
 # oAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIB
-# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFLz89Afj2UgxnTjYt77/
-# HDh0S5dvMA0GCSqGSIb3DQEBAQUABIICAMEXhPhhhBijG/QhMxCa5dlU7USb3T7V
-# CpsgLu7vW/Rr1HLu6H6e1NfDvmB7bw2IwegIkvlLtYecWoiI/SRcmoz/qhk8ptXg
-# IPrE/EMBrpyAFlIwM4oSr0v6E8BttDS2cmFMH9Mxtjbekq6gRVxlkerQgWR2IzNc
-# pGCk00Ty+dZbI10euGr+gOPfPDKw1EManLwnGIQPp9EhoglK8KwIPdaxK5bHXr/G
-# TDnfa0UHZGuAmC1bYmaE/HLW/hj9//nZX3SdZ0abhnwUzc65HTOqtksFfsrv0mCk
-# Pu6NZ2mJaTkywo2vRqo6Wi6ck8iI8PpAyJQu0itwPPF4SudlmEvYpcUoCiexy3bh
-# ubYoZ7KmgCB4chw1n2PEumSa+gjScqFZyneCF0we0+gJNl6WuF/+vciE2R9XeVRF
-# 0ZksgbpeCSkFKRKHgwxyw6GFzL15V05AKJfT4LwqU4tbnyObGCRGx4HyH5y5nGuL
-# d6hJcCdBaO94uqxh/BhFVpZJTpqmTX7N/44Rtym/Q6Zoi6Gjq+TRnRcht4p8TUh4
-# rOQN9utOGzoCeSJAmo4EBr8mOe3BzooUc3xE0hkuaxXMFGlU9ceK03goELQStG6k
-# 7C/kvJ/aJyXRHGrxxcwYFwrHktGxTvi3jHUUncp/tnhgcM+Sq9NjrU/at7aiWtgm
-# twKpcHiczgbr
+# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFDLAy057xlGCQFiZcfyl
+# dyPDzIZGMA0GCSqGSIb3DQEBAQUABIICAEABMwnbvAl2JQDowYOpmzEWcZ+W/LIq
+# rB+ITV7sScRKZhXriEC3NDVEBgySDuqBT54TJLDbPnwyrRXbnVXaNuwxxc5V+o+g
+# XtxVXx2k4GW/Xylpp9+oVaRFmjYOiUOwR84gq0BMShXUDnpOtkj91TK3pEz5Rco/
+# 5rooVioAaGBI1WTdBWxz/NRtCkU+P5PXjOMx3ROI9jBQP5eLVM8rpkuSYuJen356
+# HgIHxxRXLkqJIDB2ji4eOHIfQ5JE/MSqyuC6E/5NdCY/3SNh05SJOFh1Fg3RyvhV
+# TcYFy6kDqVh4Dkb1Stkt7mx+RISgNVeYhMlIGQyh9NwRftuAHyZ9QrT08juR208Y
+# L5BTtaNieHkLq2JrnIJfG4gvWgnQEGY4h8tpUL7d0Ghch8a3LppjCqMvxGlYUmXT
+# ArCAOO51luU3ILMJUhsAKQ5l5iItbw3BJjSeoCmFpmDPhqQ8vABusGUOGngMrbmF
+# MixTA9KUcsBDieoPYetsR2p77ZUBzDXnf1yR9d+jf1eoJb3RYJNvkKIHqwpsQGZZ
+# DzjiNnPHrNUX0+xOYPBM5Xu2NoEGH+/QFR4VpC0z5jILTaW0ooF0sgLHZQZcXCHb
+# HkYSADUmWVIvyBBN1geo8Sozl3mxFTswQc79K6E338rdZGkqtEGvKz35rrvmmmJL
+# 1cwAZhl9tGs5
 # SIG # End signature block

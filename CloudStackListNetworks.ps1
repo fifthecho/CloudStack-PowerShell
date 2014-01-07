@@ -1,10 +1,10 @@
 ﻿<#
 .SYNOPSIS
-   A CloudStack/CloudPlatform Zone Listing Scriptlet.
+   A CloudStack/CloudPlatform Network Listing Scriptlet.
 .DESCRIPTION
-   List all Zones of a CloudStack Cloud.
+   List all Networks of a CloudStack Cloud.
 .EXAMPLE
-   CloudStackListZones.ps1 
+   CloudStackListNetworks.ps1 
 #>
 # Writen by Jeff Moody (fifthecho@gmail.com)
 #
@@ -15,13 +15,14 @@ $parameters = Import-CloudStackConfig
 
 if ($parameters -ne 1) {
 	$cloud = New-CloudStack -apiEndpoint $parameters[0] -apiPublicKey $parameters[1] -apiSecretKey $parameters[2]
-    $job = Get-CloudStack -cloudStack $cloud -command listZones
-	$zones = $job.listzonesresponse
+    $job = Get-CloudStack -cloudStack $cloud -command listNetworks
+	$networks = $job.listnetworksresponse
 
-	foreach ($ZONE in $zones.zone) {
-        $ZONEID = $ZONE.id
-        $ZONENAME = $ZONE.name
-		Write-Host("Zone `"$ZONENAME`" is associated with Zone ID $ZONEID")
+	foreach ($NETWORK in $networks.network) {
+        $NetworkID = $NETWORK.id
+        $NetworkNAME = $NETWORK.name
+        $zonename = $NETWORK.zonename
+		Write-Host("Network `"$NetworkNAME`" is associated with Network ID $NetworkID in Zone $zonename")
 	}
 }
 else {
@@ -31,8 +32,8 @@ else {
 # SIG # Begin signature block
 # MIIRpQYJKoZIhvcNAQcCoIIRljCCEZICAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUCgwbsx32+hvKSdRr9DvxCpWW
-# J7Gggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUM74E0f2I8AH18YZIxGUwry6q
+# J3eggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
 # EwJJTDEWMBQGA1UEChMNU3RhcnRDb20gTHRkLjErMCkGA1UECxMiU2VjdXJlIERp
 # Z2l0YWwgQ2VydGlmaWNhdGUgU2lnbmluZzEpMCcGA1UEAxMgU3RhcnRDb20gQ2Vy
 # dGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDcxMDI0MjIwMTQ2WhcNMTcxMDI0MjIw
@@ -111,17 +112,17 @@ else {
 # aW5nMTgwNgYDVQQDEy9TdGFydENvbSBDbGFzcyAyIFByaW1hcnkgSW50ZXJtZWRp
 # YXRlIE9iamVjdCBDQQICCnYwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwxCjAI
 # oAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIB
-# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFLz89Afj2UgxnTjYt77/
-# HDh0S5dvMA0GCSqGSIb3DQEBAQUABIICAMEXhPhhhBijG/QhMxCa5dlU7USb3T7V
-# CpsgLu7vW/Rr1HLu6H6e1NfDvmB7bw2IwegIkvlLtYecWoiI/SRcmoz/qhk8ptXg
-# IPrE/EMBrpyAFlIwM4oSr0v6E8BttDS2cmFMH9Mxtjbekq6gRVxlkerQgWR2IzNc
-# pGCk00Ty+dZbI10euGr+gOPfPDKw1EManLwnGIQPp9EhoglK8KwIPdaxK5bHXr/G
-# TDnfa0UHZGuAmC1bYmaE/HLW/hj9//nZX3SdZ0abhnwUzc65HTOqtksFfsrv0mCk
-# Pu6NZ2mJaTkywo2vRqo6Wi6ck8iI8PpAyJQu0itwPPF4SudlmEvYpcUoCiexy3bh
-# ubYoZ7KmgCB4chw1n2PEumSa+gjScqFZyneCF0we0+gJNl6WuF/+vciE2R9XeVRF
-# 0ZksgbpeCSkFKRKHgwxyw6GFzL15V05AKJfT4LwqU4tbnyObGCRGx4HyH5y5nGuL
-# d6hJcCdBaO94uqxh/BhFVpZJTpqmTX7N/44Rtym/Q6Zoi6Gjq+TRnRcht4p8TUh4
-# rOQN9utOGzoCeSJAmo4EBr8mOe3BzooUc3xE0hkuaxXMFGlU9ceK03goELQStG6k
-# 7C/kvJ/aJyXRHGrxxcwYFwrHktGxTvi3jHUUncp/tnhgcM+Sq9NjrU/at7aiWtgm
-# twKpcHiczgbr
+# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFPFM6yk6wUOwXqFlKlSI
+# W+veWMDtMA0GCSqGSIb3DQEBAQUABIICAHWEjcNOttDacOgLLb48gWKxhMy2owHf
+# h2BwAH5FwCN27Awyd/QBILJEyZlhb8OekJHaXkonwkw4SD1eCqvmqQfYUXpRpynJ
+# 2efuqLxwoKjMiy4kgxrvvX732nEoRpNYU6ooAhwTz+PORhfAbZVdVheCCLEgUW+h
+# A2kyKFQSTbI8pwyjXQLkNq+zW1wVl4U/PHOL6alWakbrJMzGxQ+lkRrJuszpvw6V
+# 2AEJyM5om9PYrWzFM1IEP3H7c77+dzHOfxrQMPXv37il91Cxm6PCT4I8IdJHj89R
+# Mc77qG4U2D3MFL/ToMEKus1meFuO1KQceTjj0vYqv0Adrpy9F7CPasHuQOfZzVIn
+# H15wkjc191ZOeGoePc8DFMPim6IT7PcfYVvRPejTE0VnS5LeZHvKyBVyC8sCqZ/l
+# gAPm5VvmwMvetvpo7HmUvaw3x1neuQN+/7tuvNPcAW3XEWXQW6djpphlUbueAYG2
+# w1MNfsKseV2ULadKvHqQVRA4QPBnhEa5EZHPVwt+IKqmJMaDeYUMuBYHqVNCa2nC
+# LJxH6w+dgX0iqPY93PdHp5+Frn0Qs/5+9LTmKXpduCYzo0TGPm1vdOpQlYZZldlI
+# GPOs5np6mWJkr2LfKPYPaxRej2CPEl0AyTiJdZbegVHNX1M+LZXOGPamQ4s4eDM3
+# 4Xi8eoMonzc8
 # SIG # End signature block
