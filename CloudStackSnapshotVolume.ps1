@@ -29,9 +29,10 @@ if ($parameters -ne 1) {
 	$jobid = $job.createsnapshotresponse.jobid
 	Write-Host "Started snaphsot job $jobid"
 	do {
+        $watitime =  Get-Random -Minimum 5 -Maximum 60
 	    Write-Host -NoNewline "."
 	    $jobStatus = Get-CloudStack -cloudStack $cloud -command queryAsyncJobResult -options jobid=$jobid
-	    Start-Sleep -Seconds 5
+	    Start-Sleep -Seconds $watitime
 	    }
 	while ($jobStatus.queryasyncjobresultresponse.jobstatus -eq 0)
 	$statusCode = $jobStatus.queryasyncjobresultresponse.jobresultcode
@@ -45,8 +46,8 @@ else {
 # SIG # Begin signature block
 # MIIRpQYJKoZIhvcNAQcCoIIRljCCEZICAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUPne9+x7iy+N5BXSwIRjXJ6tY
-# OCOggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUJGaKtn2+oTzPme+uu/HaUZc5
+# UQyggg3aMIIGcDCCBFigAwIBAgIBJDANBgkqhkiG9w0BAQUFADB9MQswCQYDVQQG
 # EwJJTDEWMBQGA1UEChMNU3RhcnRDb20gTHRkLjErMCkGA1UECxMiU2VjdXJlIERp
 # Z2l0YWwgQ2VydGlmaWNhdGUgU2lnbmluZzEpMCcGA1UEAxMgU3RhcnRDb20gQ2Vy
 # dGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDcxMDI0MjIwMTQ2WhcNMTcxMDI0MjIw
@@ -125,17 +126,17 @@ else {
 # aW5nMTgwNgYDVQQDEy9TdGFydENvbSBDbGFzcyAyIFByaW1hcnkgSW50ZXJtZWRp
 # YXRlIE9iamVjdCBDQQICCnYwCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcCAQwxCjAI
 # oAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIB
-# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFCsf4rRboFSxBUT3aT0E
-# ng7qYe9hMA0GCSqGSIb3DQEBAQUABIICACSxpQlpo3qwMiMKma0j/Lh4/6h4IidE
-# /NrHSXOyRsBRPqWKKhnBQE7YPZxwnqp1f+jlrkgpS1j9t2yC1RKEM6RR/oNnvKBp
-# MnzHXKp7zdQKFEfCDt6N9notHWWi0Gome28QvFxyegvWFe9Dx5iOPGjCbPiaeQxN
-# Jf1sNvCko/wsbnvHxso724gh2J1Vf5TSmbBZMNCaauAr2km14DVTWF2FkjxU/9Po
-# LlQv0IjjEUF47LhwP2cW6AOQZWaHCdeEYqbX/Rxq1JaibBaSSfUKAW0W/i25n35h
-# 7vqh3TswmcT8VnxpgnGzdNwCMLaeKQfchY6o2R8StWu0izN9bacH0Y+uDsv5y+6j
-# MW9yZBqmqhoNgsyaWYOwfz7Ppn4r2LdbCZSBIKnZAAU0TLVFFuI//5+cBR8BSzWk
-# /dOFrt9zt2pAeowqMzT//He6CfMo3TObLopsdNcLnpUpLuHOde6RJqdfyAF8hHCO
-# cr4pntwRiICSKpoFhdjQTexe/TNCaHofPq+SyisVTbsX0Uy5cmU45FllNHHu+ikY
-# 9+JJr6Zj7UppyWGQ+FKEEjYmYp9WufYmuMhIshCLIBCcNusKi+7YV90BJSNPI15D
-# +1pRVmOfwG7+zYnJZMaksH/THn/WzcMNWpRIWnm/WB3IW2QPb29oIYGhhCgq6AU/
-# w4erOOiD65bP
+# CzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFHMqNo4Xy7Eh9EvzgAwv
+# e27wZlI/MA0GCSqGSIb3DQEBAQUABIICABLO8SqhAWxYDWcq77O7fsEiWYq4FS6y
+# gCMzBkaekCeqzGMoTlweNjTizibE67xXYoMmEVFc9Vujz+esjQVtkr3/M2+oXnsG
+# rU8/xjxwLhhTarymEQOJffwQ6pPkFVlbx3J2eNBfRWrpKweGEIR0dcBady/uCQ4t
+# JfhthO4r7JRsNPkXa1InFPlp4ggnXMUlpteeB31ijcDxaU0+gBmJP7Nk/NzLMIYi
+# MTd/w2tmWNwSvjJ0Omw8ARWjDkidat9inyJ7y3PoX5V775LZ7d9CQFW8xAPROZJa
+# a8VBHhyQc1vHeF4ykE7oipB9uBNFNK0yg2wqq4Mcwjgc5+QKKkvgmgU+Y8JfQKsH
+# zB+/HzCXE57Ykt8GeaMyjnTBe8xNQyOELSya5DmjPhP7JLt5zI3ZptkEpkuk/G4k
+# CcC3iSF4SauT2e8XqO0n8I33Ali3laeHuHjOc1WQB4lb38S/oD7G3j3T4KajPMde
+# f96h6XMfgRdgYPHwAlE+/znfiOcQnpbK2WjYgpTq/gry4KRR4pIZrV9G5cSfHNhu
+# Gab/dmk9t0pBAqU3fiUIuHHXvOzX//Neyljo3pt+FFfInJX5upr4etHOV8srIkFG
+# Qm7xAFsbMy9KyoHovWRD/JNIa0D9zs33TtLxSnf4oNdQ7iLQ5CteZU+NjglVU4VJ
+# MklFptGt10DD
 # SIG # End signature block
