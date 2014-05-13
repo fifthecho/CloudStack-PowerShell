@@ -3,30 +3,75 @@
    A CloudStack/CloudPlatform SecurityGroup Listing Scriptlet.
 .DESCRIPTION
    List all SecurityGroups of a CloudStack Cloud.
+   Can Get a securitygroup ID by the name who provide
 .EXAMPLE
    CloudStackListSecurityGroups.ps1 
 #>
 # Writen by Jeff Moody (fifthecho@gmail.com)
+# Edited by Jerome RIVIERE (www.jerome-riviere.re)
 #
 # 2013/5/17  v1.0 created
+# 2014/5/13  v1.1 add securitygroupbyname
+Param(
+[Parameter(Mandatory=$false)]
+  [String]
+  $name
+)
 
-Import-Module CloudStackClient
-$parameters = Import-CloudStackConfig
+function Get-SecurityGroup(){
+	Import-Module CloudStackClient
+	$parameters = Import-CloudStackConfig
+	if ($parameters -ne 1) {
+		$cloud = New-CloudStack -apiEndpoint $parameters[0] -apiPublicKey $parameters[1] -apiSecretKey $parameters[2]
+		$job = Get-CloudStack -cloudStack $cloud -command listSecurityGroups
+		$securityGroups = $job.listSecurityGroupsresponse
 
-if ($parameters -ne 1) {
-	$cloud = New-CloudStack -apiEndpoint $parameters[0] -apiPublicKey $parameters[1] -apiSecretKey $parameters[2]
-    $job = Get-CloudStack -cloudStack $cloud -command listSecurityGroups
-	$SecurityGroups = $job.listSecurityGroupsresponse
-
-	foreach ($SecurityGroup in $SecurityGroups.SecurityGroup) {
-        $SecurityGroupID = $SecurityGroup.id
-        $SecurityGroupNAME = $SecurityGroup.name
-		Write-Host("Security Group `"$SecurityGroupNAME`" is associated with Security Group ID $SecurityGroupID ")
+		foreach ($SecurityGroup in $securityGroups.SecurityGroup) {
+			$securityGroupId = $securityGroup.id
+			$securityGroupName = $SecurityGroup.name
+			Write-Host("Security Group `"$securityGroupName`" is associated with Security Group ID $securityGroupID ")
+		}
+	}
+	else {
+		Write-Error "Please configure the $env:userprofile\cloud-settings.txt file"
 	}
 }
-else {
-	Write-Error "Please configure the $env:userprofile\cloud-settings.txt file"
+
+function Get-SecurityGroupByName(){
+	Param(
+	[Parameter(Mandatory=$true)]
+	  [String]
+	  $name
+	)
+	
+	Import-Module CloudStackClient
+	$parameters = Import-CloudStackConfig
+	if ($parameters -ne 1) {
+		$cloud = New-CloudStack -apiEndpoint $parameters[0] -apiPublicKey $parameters[1] -apiSecretKey $parameters[2]
+		
+		$options = "securityGroupName=$name"
+		
+		$job = Get-CloudStack -cloudStack $cloud -command listSecurityGroups -options $options
+		$securityGroups = $job.listSecurityGroupsresponse
+		$SecurityGroupName = $securityGroups.SecurityGroup.name
+		$SecurityGroupId = $securityGroups.SecurityGroup.id
+		# prevent to write-host when the security group does'nt exist
+		if($securityGroupId -ne $null){
+			write-host "Security Group $SecurityGroupName is associated with Security Group ID $SecurityGroupId"
+			return $SecurityGroupId
+		}
+	}
+	else {
+		Write-Error "Please configure the $env:userprofile\cloud-settings.txt file"
+	}
 }
+
+if($name){
+	Get-SecurityGroupByName -name $name
+}else{
+	Get-SecurityGroup
+}
+
 
 # SIG # Begin signature block
 # MIIRpQYJKoZIhvcNAQcCoIIRljCCEZICAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
