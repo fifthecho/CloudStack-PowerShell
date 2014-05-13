@@ -21,9 +21,14 @@ Once the module is installed, it can be loaded via ```Import-Module CloudStackCl
 
 The CloudStackListVirtualMachines, CloudStackListZones, CloudStackSnapshotVolume, and CloudStackSnapshotHistoryManager scripts shoud give you an idea of how to interact with the Module.
 
-```
+
 Now, you can get a securitygroup by name (just precise the parameter name when you call CloudStackListSecurityGroups). 
+```
+	.\CloudStackListSecurityGroups.ps1 -name $securityGroupName
+```
 
 Create a securityGroup is possible with CloudStackCreateSecurityGroups
+```
+	.\CloudStackCreateSecurityGroups.ps1 -name name [-description description]
 
 ```
